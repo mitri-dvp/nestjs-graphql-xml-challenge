@@ -4,6 +4,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { XmlParserService } from '@src/xml/xml.service';
 import { AllVehicleMakes, Result, VehicleTypesForMakeId } from '@src/types';
+import { DatabaseService } from '@src/database/database.service';
 
 @Injectable()
 export class VehicleService {
@@ -12,7 +13,43 @@ export class VehicleService {
   constructor(
     private readonly httpService: HttpService,
     private readonly xmlParserService: XmlParserService,
+    private readonly databaseService: DatabaseService,
   ) {}
+
+  async saveVehiclesToDatabase(results: Result[]) {
+    const saveResult = async (result: Result) => {
+      return await this.databaseService.make.upsert({
+        create: {
+          makeId: result.makeId,
+          makeName: String(result.makeName),
+          makeTypes: {
+            connectOrCreate: result.vehicleTypes.map((type) => {
+              return {
+                where: { typeId: type.typeId },
+                create: { typeId: type.typeId, typeName: type.typeName },
+              };
+            }),
+          },
+        },
+        update: {
+          makeName: String(result.makeName),
+          makeTypes: {
+            connectOrCreate: result.vehicleTypes.map((type) => {
+              return {
+                where: { typeId: type.typeId },
+                create: { typeId: type.typeId, typeName: type.typeName },
+              };
+            }),
+          },
+        },
+        where: {
+          makeId: result.makeId,
+        },
+      });
+    };
+
+    await Promise.all(results.map(saveResult));
+  }
 
   async getAllVehicleMakesXML() {
     return await firstValueFrom(
@@ -74,7 +111,7 @@ export class VehicleService {
       AllVehicleMakesXML.data,
     );
 
-    const response: Result[] = await Promise.all(
+    const results: Result[] = await Promise.all(
       AllVehicleMakesObject.Response.Results.AllVehicleMakes.splice(0, 10).map(
         async (make) => {
           const vehicleTypes = await this.getVehicleTypesForMakeId(
@@ -90,6 +127,8 @@ export class VehicleService {
       ),
     );
 
-    return response;
+    await this.saveVehiclesToDatabase(results);
+
+    return results;
   }
 }
