@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+ENV $(cat .env)
+
 RUN npm run build
 
 EXPOSE 3000

@@ -1,0 +1,36 @@
+version: '3.8'
+name: nestjs-back-end
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-back-end-server
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16.1
+    container_name: nestjs-back-end-postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - './docker-data/pg-data:/var/lib/postgresql/data'
+    env_file:
+      - .env
+
+  pgadmin:
+    image: dpage/pgadmin4:8.8
+    container_name: nestjs-back-end-pgadmin
+    ports:
+      - '8080:80'
+    volumes:
+      - './docker-data/pgadmin-data:/var/lib/pgadmin'
+    env_file:
+      - .env
+    depends_on:
+      - postgres
