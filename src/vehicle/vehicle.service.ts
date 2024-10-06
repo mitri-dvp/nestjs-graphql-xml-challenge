@@ -44,6 +44,30 @@ export class VehicleService {
     );
   }
 
+  async getVehicleTypesForMakeId(
+    makeId: number,
+  ): Promise<Result['vehicleTypes']> {
+    const VehicleTypesForMakeIdXML =
+      await this.getVehicleTypeForMakeIdXML(makeId);
+
+    const VehicleTypeForMakeIdObject =
+      this.xmlParserService.parse<VehicleTypesForMakeId>(
+        VehicleTypesForMakeIdXML.data,
+      );
+
+    let vehicleTypesForMakeIds =
+      VehicleTypeForMakeIdObject.Response.Results.VehicleTypesForMakeIds;
+
+    if (!Array.isArray(vehicleTypesForMakeIds)) {
+      vehicleTypesForMakeIds = [vehicleTypesForMakeIds];
+    }
+
+    return vehicleTypesForMakeIds.map((type) => ({
+      typeId: type.VehicleTypeId,
+      typeName: type.VehicleTypeName,
+    }));
+  }
+
   async getVehicles(): Promise<Result[]> {
     const AllVehicleMakesXML = await this.getAllVehicleMakesXML();
     const AllVehicleMakesObject = this.xmlParserService.parse<AllVehicleMakes>(
@@ -53,25 +77,9 @@ export class VehicleService {
     const response: Result[] = await Promise.all(
       AllVehicleMakesObject.Response.Results.AllVehicleMakes.splice(0, 10).map(
         async (make) => {
-          const VehicleTypesForMakeIdXML =
-            await this.getVehicleTypeForMakeIdXML(make.Make_ID);
-
-          const VehicleTypeForMakeIdObject =
-            this.xmlParserService.parse<VehicleTypesForMakeId>(
-              VehicleTypesForMakeIdXML.data,
-            );
-
-          let vehicleTypesForMakeIds =
-            VehicleTypeForMakeIdObject.Response.Results.VehicleTypesForMakeIds;
-
-          if (!Array.isArray(vehicleTypesForMakeIds)) {
-            vehicleTypesForMakeIds = [vehicleTypesForMakeIds];
-          }
-
-          const vehicleTypes = vehicleTypesForMakeIds.map((type) => ({
-            typeId: type.VehicleTypeId,
-            typeName: type.VehicleTypeName,
-          })) as Result['vehicleTypes'];
+          const vehicleTypes = await this.getVehicleTypesForMakeId(
+            make.Make_ID,
+          );
 
           return {
             makeId: make.Make_ID,
