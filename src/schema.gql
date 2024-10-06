@@ -1,0 +1,20 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""A vehicle make"""
+type Make {
+  makeId: ID!
+  makeName: String!
+  makeTypes: [VehicleType!]!
+}
+
+"""A vehicle type"""
+type VehicleType {
+  typeId: ID!
+  typeName: String!
+}
+
+type Query {
+  vehicles: [Make!]!
+}

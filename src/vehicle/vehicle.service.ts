@@ -120,7 +120,7 @@ export class VehicleService {
 
           return {
             makeId: make.Make_ID,
-            makeName: make.Make_Name,
+            makeName: String(make.Make_Name),
             vehicleTypes: vehicleTypes,
           };
         },

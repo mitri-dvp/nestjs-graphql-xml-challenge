@@ -42,7 +42,7 @@ export interface VehicleTypesForMakeId {
 // Expected Output Type
 export interface Result {
   makeId: number;
-  makeName: number | string;
+  makeName: string;
   vehicleTypes: {
     typeId: number;
     typeName: string;
