@@ -8,10 +8,11 @@ services:
     container_name: nestjs-back-end-server
     ports:
       - '3000:3000'
-    env_file:
-      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:16.1
@@ -22,6 +23,11 @@ services:
       - './docker-data/pg-data:/var/lib/postgresql/data'
     env_file:
       - .env
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -33,4 +39,5 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
