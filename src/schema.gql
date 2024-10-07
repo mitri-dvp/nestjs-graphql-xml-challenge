@@ -3,10 +3,10 @@
 # ------------------------------------------------------
 
 """A vehicle make"""
-type Make {
+type VehicleMake {
   makeId: ID!
   makeName: String!
-  makeTypes: [VehicleType!]!
+  vehicleTypes: [VehicleType!]!
 }
 
 """A vehicle type"""
@@ -16,5 +16,5 @@ type VehicleType {
 }
 
 type Query {
-  vehicles: [Make!]!
+  vehicles: [VehicleMake!]!
 }

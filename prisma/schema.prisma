@@ -13,14 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Make {
-  makeId    Int           @id
-  makeName  String
-  makeTypes VehicleType[]
+model VehicleMake {
+  makeId       Int           @id
+  makeName     String
+  vehicleTypes VehicleType[]
 }
 
 model VehicleType {
-  typeId    Int    @id
+  typeId    Int           @id
   typeName  String
-  typeMakes Make[]
+  typeMakes VehicleMake[]
 }

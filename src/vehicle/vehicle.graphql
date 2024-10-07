@@ -3,12 +3,12 @@ type VehicleType {
   typeName: String!
 }
 
-type Make {
+type VehicleMake {
   makeId: Int!
   makeName: String!
   vehicleTypes: [VehicleType!]!
 }
 
 type Query {
-  vehicles: [Make]!
+  vehicles: [VehicleMake]!
 }

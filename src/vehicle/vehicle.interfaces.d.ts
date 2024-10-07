@@ -38,13 +38,3 @@ export interface VehicleTypesForMakeId {
   VehicleTypeId: number;
   VehicleTypeName: string;
 }
-
-// Expected Output Type
-export interface Result {
-  makeId: number;
-  makeName: string;
-  vehicleTypes: {
-    typeId: number;
-    typeName: string;
-  }[];
-}

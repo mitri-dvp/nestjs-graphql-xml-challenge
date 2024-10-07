@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { VehicleService } from '@src/vehicle/vehicle.service';
 import { VechileController } from '@src/vehicle/vehicle.controller';
-import { HttpModule } from '@nestjs/axios';
 import { DatabaseModule } from '@src/database/database.module';
-import { VehiclesResolver } from './vehicle.resolver';
+import { VehiclesResolver } from '@src/vehicle/vehicle.resolver';
 
 @Module({
   imports: [HttpModule, DatabaseModule],

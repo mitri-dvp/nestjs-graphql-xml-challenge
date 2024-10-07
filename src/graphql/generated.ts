@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -9,18 +8,18 @@
 /* eslint-disable */
 
 export interface VehicleType {
-    typeId: number;
-    typeName: string;
+  typeId: number;
+  typeName: string;
 }
 
-export interface Make {
-    makeId: number;
-    makeName: string;
-    vehicleTypes: VehicleType[];
+export interface VehicleMake {
+  makeId: number;
+  makeName: string;
+  vehicleTypes: VehicleType[];
 }
 
 export interface IQuery {
-    vehicles(): Nullable<Make>[] | Promise<Nullable<Make>[]>;
+  vehicles(): Nullable<VehicleMake>[] | Promise<Nullable<VehicleMake>[]>;
 }
 
 type Nullable<T> = T | null;

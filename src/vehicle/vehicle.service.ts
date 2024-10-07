@@ -3,8 +3,12 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { XmlParserService } from '@src/xml/xml.service';
-import { AllVehicleMakes, Result, VehicleTypesForMakeId } from '@src/types';
+import { VehicleMake } from '@src/vehicle/vechicle.model';
 import { DatabaseService } from '@src/database/database.service';
+import {
+  AllVehicleMakes,
+  VehicleTypesForMakeId,
+} from '@src/vehicle/vehicle.interfaces';
 
 @Injectable()
 export class VehicleService {
@@ -16,14 +20,14 @@ export class VehicleService {
     private readonly databaseService: DatabaseService,
   ) {}
 
-  async saveVehiclesToDatabase(results: Result[]) {
-    const saveResult = async (result: Result) => {
-      return await this.databaseService.make.upsert({
+  async saveVehiclesToDatabase(vehicleMakes: VehicleMake[]) {
+    const saveResult = async (vehicleMake: VehicleMake) => {
+      return await this.databaseService.vehicleMake.upsert({
         create: {
-          makeId: result.makeId,
-          makeName: String(result.makeName),
-          makeTypes: {
-            connectOrCreate: result.vehicleTypes.map((type) => {
+          makeId: vehicleMake.makeId,
+          makeName: String(vehicleMake.makeName),
+          vehicleTypes: {
+            connectOrCreate: vehicleMake.vehicleTypes.map((type) => {
               return {
                 where: { typeId: type.typeId },
                 create: { typeId: type.typeId, typeName: type.typeName },
@@ -32,9 +36,9 @@ export class VehicleService {
           },
         },
         update: {
-          makeName: String(result.makeName),
-          makeTypes: {
-            connectOrCreate: result.vehicleTypes.map((type) => {
+          makeName: String(vehicleMake.makeName),
+          vehicleTypes: {
+            connectOrCreate: vehicleMake.vehicleTypes.map((type) => {
               return {
                 where: { typeId: type.typeId },
                 create: { typeId: type.typeId, typeName: type.typeName },
@@ -43,12 +47,12 @@ export class VehicleService {
           },
         },
         where: {
-          makeId: result.makeId,
+          makeId: vehicleMake.makeId,
         },
       });
     };
 
-    await Promise.all(results.map(saveResult));
+    await Promise.all(vehicleMakes.map(saveResult));
   }
 
   async getAllVehicleMakesXML() {
@@ -83,7 +87,7 @@ export class VehicleService {
 
   async getVehicleTypesForMakeId(
     makeId: number,
-  ): Promise<Result['vehicleTypes']> {
+  ): Promise<VehicleMake['vehicleTypes']> {
     const VehicleTypesForMakeIdXML =
       await this.getVehicleTypeForMakeIdXML(makeId);
 
@@ -105,13 +109,13 @@ export class VehicleService {
     }));
   }
 
-  async getVehicles(): Promise<Result[]> {
+  async getVehicles(): Promise<VehicleMake[]> {
     const AllVehicleMakesXML = await this.getAllVehicleMakesXML();
     const AllVehicleMakesObject = this.xmlParserService.parse<AllVehicleMakes>(
       AllVehicleMakesXML.data,
     );
 
-    const results: Result[] = await Promise.all(
+    const vehicleMakes: VehicleMake[] = await Promise.all(
       AllVehicleMakesObject.Response.Results.AllVehicleMakes.splice(0, 10).map(
         async (make) => {
           const vehicleTypes = await this.getVehicleTypesForMakeId(
@@ -122,13 +126,13 @@ export class VehicleService {
             makeId: make.Make_ID,
             makeName: String(make.Make_Name),
             vehicleTypes: vehicleTypes,
-          };
+          } as VehicleMake;
         },
       ),
     );
 
-    await this.saveVehiclesToDatabase(results);
+    await this.saveVehiclesToDatabase(vehicleMakes);
 
-    return results;
+    return vehicleMakes;
   }
 }

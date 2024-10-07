@@ -1,20 +1,20 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType({ description: 'A vehicle make' })
-export class Make {
-  @Field((type) => ID)
+export class VehicleMake {
+  @Field(() => ID)
   makeId: number;
 
   @Field()
   makeName: string;
 
-  @Field((type) => [VehicleType])
-  makeTypes: VehicleType[];
+  @Field(() => [VehicleType])
+  vehicleTypes: VehicleType[];
 }
 
 @ObjectType({ description: 'A vehicle type' })
 export class VehicleType {
-  @Field((type) => ID)
+  @Field(() => ID)
   typeId: number;
 
   @Field()
