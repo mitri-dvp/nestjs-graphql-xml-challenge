@@ -10,7 +10,10 @@ COPY . .
 
 ENV $(cat .env)
 
+RUN npx prisma generate
+
 RUN npm run build
+
 
 EXPOSE 3000
 
